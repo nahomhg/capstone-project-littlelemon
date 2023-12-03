@@ -12,17 +12,6 @@ def index(request):
 class MenuItemView(ListCreateAPIView):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
-    
-    # def get(self, request):
-    #     menu_items = Menu.objects.all();
-    #     serializer = MenuSerializer(menu_items, many=True);
-    #     return JsonResponse(serializer.data); 
-
-    # def post(self, request):
-    #     if request.method == "POST":
-    #         data = MenuSerializer(request.POST);
-    #         if data.is_valid():
-    #             pass;
 
 class SingleItemView(RetrieveAPIView, DestroyAPIView):
     queryset = Menu.objects.all();
