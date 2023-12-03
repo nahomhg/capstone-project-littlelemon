@@ -3,5 +3,6 @@ from . import views
 
 app_name = "restaurant"
 urlpatterns = [
-    path('', views.index, name="index"),
+    path('menu', views.MenuItemView.as_view(), name="menu_list"),
+    path('menu/<int:pk>', views.SingleItemView.as_view(), name="menu_item"),
 ]
