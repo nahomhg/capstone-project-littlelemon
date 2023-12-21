@@ -1,10 +1,14 @@
+{% extends 'base.html' %}
 {% load static %}
-<html>
-   <head>
-      <title>Capstone Project</title>
-   </head>
-   <body>
-      <img src="{% static 'restaurant/littlelemon.png' %}"/>
-      <h1 style="text-align:center;">Welcome ToLittleLemon Restaurant</h1>
-   </body>
-</html>
+{% block content %}
+       <ul>
+         {% if data %}
+            {% for item in data %}
+             <li>  {{ item.title }}</a> - £{{item.price}} </li>
+             {% comment %} <a href="{% url '' %}">{ {% endcomment %}
+            {% endfor %}
+         {% else %}
+            No Menu
+         {% endif %}
+      <ul>
+{% endblock %}

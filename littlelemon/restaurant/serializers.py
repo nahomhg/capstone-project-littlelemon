@@ -7,7 +7,6 @@ class MenuSerializer(ModelSerializer):
         model = Menu;
         fields = '__all__';
 
-
 class BookingSerializer(ModelSerializer):
     class Meta:
         model = Booking

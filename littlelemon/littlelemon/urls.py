@@ -19,13 +19,12 @@ from rest_framework import routers
 from restaurant.views import BookingViewSet
 
 router = routers.DefaultRouter()
-router.register(r'booking', viewset=BookingViewSet);
+router.register(r'', viewset=BookingViewSet);
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('reservation/', include('reservation.urls')),
     path('api/', include('restaurant.urls')),
-    path('restaurant/booking/', include(router.urls)),
+    path('api/booking/', include(router.urls)),
     path('auth/',include('djoser.urls')),
     path('auth/',include('djoser.urls.authtoken')),
 ]
