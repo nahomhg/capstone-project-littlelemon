@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
+    {% if item %}
+        <ul>
+            <li> {{ item.title }}</li>
+            <li> £{{ item.price }} </li>
+        </ul>
+    {% else %}
+        <p>Sorry - item doesn't exist on our menu</p>
+    {% endif %}
 {% endblock %}

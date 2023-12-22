@@ -4,8 +4,7 @@
        <ul>
          {% if data %}
             {% for item in data %}
-             <li>  {{ item.title }}</a> - £{{item.price}} </li>
-             {% comment %} <a href="{% url '' %}">{ {% endcomment %}
+             <li> <a href="{% url 'restaurant:item_detail' item.pk %} ">{{ item.title }}</a> - £{{item.price}} </li>
             {% endfor %}
          {% else %}
             No Menu

@@ -11,7 +11,7 @@ from django.views.generic import TemplateView
 class MenuItemView(ListCreateAPIView):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
-    permission_classes = [IsAuthenticated];
+    # permission_classes = [IsAuthenticated];
     
 class MenuItemsTemplate(TemplateView):
     template_name = 'index.html';
@@ -25,7 +25,7 @@ class MenuItemsTemplate(TemplateView):
 class SingleItemView(RetrieveAPIView, DestroyAPIView,UpdateAPIView):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 
 
@@ -34,10 +34,8 @@ class SingeItemTemplateView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(str(self.request))
-        context[""] = MenuItemView.queryset.get(self.request.GET);
-
-        return context
+        context["item"] = MenuItemView.queryset.get(pk=kwargs["pk"]);
+        return context;
 
     
     
