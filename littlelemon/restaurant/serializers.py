@@ -18,4 +18,3 @@ class BookingSerializer(ModelSerializer):
                 fields=['name','booking_date','booking_slot']
             )
         ];
-
