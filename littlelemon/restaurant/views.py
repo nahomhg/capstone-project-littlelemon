@@ -17,16 +17,15 @@ class ThrottleAPIMixin:
 class AuthenticationMixin:
     permission_classes = [IsAuthenticated]
 
-class MenuItemView(ListCreateAPIView, ThrottleAPIMixin, AuthenticationMixin):
+class MenuItemView(ListCreateAPIView, ThrottleAPIMixin):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
     
-
 class SingleItemView(RetrieveUpdateDestroyAPIView, ThrottleAPIMixin, AuthenticationMixin):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
     
-class BookingViewSet(ModelViewSet, RetrieveUpdateDestroyAPIView , ThrottleAPIMixin, AuthenticationMixin):
+class BookingViewSet(ModelViewSet, RetrieveUpdateDestroyAPIView, ThrottleAPIMixin, AuthenticationMixin):
     queryset = Booking.objects.all();
     serializer_class = BookingSerializer
 
@@ -36,8 +35,7 @@ class BookingViewSet(ModelViewSet, RetrieveUpdateDestroyAPIView , ThrottleAPIMix
             bookings = Booking.objects.filter(booking_date__contains=reservation_date);
             bookings_json = serializers.serialize('json',bookings)
             return Response(json.loads(bookings_json),status=200);
-        return HttpResponse({"ERROR":"Invalid Date"},status=400)
-    
+        return HttpResponse({"ERROR":"Invalid Date"},status=400)    
 
 class Validate_Date(datetime):
     def is_date(value):

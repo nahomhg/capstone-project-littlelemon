@@ -2,11 +2,12 @@ from typing import Any
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from restaurant.views import MenuItemView
-from restaurant.views import ThrottleAPIMixin;
+from restaurant.views import ThrottleAPIMixin, AuthenticationMixin, UserRateThrottle
 from restaurant.serializers import BookingSerializer
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+
 
 # Create your views here.
 
@@ -18,7 +19,7 @@ class MenuItemsTemplate(TemplateView, ThrottleAPIMixin):
         context["items"] = MenuItemView.queryset.all;
         return context
 
-class SingeItemTemplateView(TemplateView, ThrottleAPIMixin):
+class SingeItemTemplateView(TemplateView, AuthenticationMixin, UserRateThrottle):
     template_name = 'item_detail.html';
     
     def get_context_data(self, **kwargs):

@@ -143,8 +143,9 @@
                 }
             )
             .then(response => response.json())
-            .then(data => {
-                console.log('SUCCESS: '+data)
+            .then(data => {                
+                alert('Booking Made for '+JSON.stringify(data['name'])+' for '+JSON.stringify(data['booking_date'])+' at '+JSON.stringify(data['booking_slot'])+':00');
+                document.getElementById('form').reset();
             }) 
             .catch((error) => {
                 console.log('POST ERROR: '+error)
