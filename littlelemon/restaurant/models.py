@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 class Booking(models.Model):
     name = models.CharField(max_length=255, null=False)
     no_of_guests = models.IntegerField()
-    booking_date = models.DateTimeField()
+    booking_date = models.DateField();
+    booking_slot = models.SmallIntegerField(default=10);
 
     def __str__(self):
         return f"{self.name}";

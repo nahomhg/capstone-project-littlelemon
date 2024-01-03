@@ -1,0 +1,12 @@
+{% load static %}
+<header>
+  <img src="{% static 'img/logo.png' %}" />
+</header>
+<nav>
+  <ul>
+    
+    <li><a href="{% url 'frontend:menu_ui' %}">Menu</a></li>
+    <li><a href="{% url 'frontend:booking_ui' %}">Book</a></li>
+   
+  </ul>
+</nav>
