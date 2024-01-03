@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section>
+        <article>
+        <div class="row">
+            <div class="column">
+            <h1>Make Reservation</h1>
+                
+            <form method="POST" id="form" action="{% url 'frontend:booking_ui' %}">
+                {% csrf_token %}
+                <p>
+                <label for="first_name">Name</label>
+                <input type="text" placeholder="Reservation For..." maxlength="200" required id="first_name">
+                </p>
+                <p>
+                <label for="reservation_date">Reservation Date<label>
+                <input type="date" required id="reservation_date" data-url="{% url 'frontend:booking_ui' %}">
+                </p>
+                <p>
+                <div class="container">
+                    <div class="column-reservation-time"> 
+                        <label for="reservation_slot">Reservation time</label>
+                        <select id="reservation_slot">
+                            <option value="0" disabled>Select time</option>
+                        </select>
+                    </div>
+                    <div class="column-guest_number">
+                        <label for="guest_number">Guest No.</label>
+                        <select id="guest_number">
+                           
+                        </select>
+                    </div>
+                    </p>
+                </div>
+                <button type="button" id="button">Reserve</button>
+            </form>
+        </div>
+
+        <div class="column">
+            <div class="videowrap">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d11898.289517452584!2d-87.60853049433447!3d41.79442860243028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2912ce6f7027%3A0xc0cfb5545d4a37b2!2sHyde%20Park%2C%20Chicago%2C%20IL%2C%20USA!5e0!3m2!1sen!2spt!4v1662384760663!5m2!1sen!2spt"
+                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+    </article>
+    </section>
+    <script>
+        
+        const date = new Date()
+        const month_format = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
+        const current_date = `${date.getFullYear()}-${month_format}-${date.getDate().toString().padStart(2, "0")}`
+
+        const res_date = document.getElementById('reservation_date').value;
+        window.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('reservation_date').value = current_date;
+            get_guest_number();
+            getBookings();
+            
+        })
+
+        
+        document.getElementById('reservation_date').addEventListener('change', getBookings);
+
+        function getBookings(event) {
+            let reserved_slots = []
+            const date = document.getElementById('reservation_date').value
+            const booking_check_url = get_selected_day_bookings(date);
+            console.log('res date is = '+date+' and is of type '+typeof(date))
+
+            fetch(booking_check_url)
+            .then(r => r.json())
+            .then(data => {
+                data_json = JSON.parse(JSON.stringify(data));
+
+                reserved_slots = []
+                bookings = []
+
+                for(let i = 0; i < data_json.length; i++){
+                    reserved_slots.push(data_json[i].fields['booking_slot']);
+                    console.log(reserved_slots);
+                    bookings.push(`<li>${data_json[i].fields['name']} - ${formatTime(data_json[i].fields['booking_slot'])}</li>`);
+
+                }
+
+                slot_options = '<option value="0" disabled>Select time</option>';
+                for(let i = 11; i < 23; i++){
+                  const label = formatTime(i);
+                  if(reserved_slots.includes(i)){
+                    slot_options += `<option value=${i} disabled>${label}</option>`
+        
+                  }else{
+                    slot_options += `<option value=${i}>${label}</option>`;
+                  }
+                }  
+                console.log('data+ '+slot_options)
+        
+                document.getElementById('reservation_slot').innerHTML = slot_options
+                if(bookings === ''){
+                  bookings = "No bookings"
+                }
+
+            }).catch((error)=>{
+                console.log("ERRPR: "+error)
+            });
+        }
+
+        function formatTime(time) {
+            const ampm = time < 12 ? 'AM' : 'PM'
+            const t = time < 12 ? time : time > 12 ? time - 12 : time
+            const label = `${t} ${ampm}`
+            return label
+        }
+
+      
+        document.getElementById('button').addEventListener('click', function (e) {
+
+            const formdata = {
+                "name": document.getElementById('first_name').value,
+                "booking_date": document.getElementById('reservation_date').value,
+                "booking_slot": document.getElementById('reservation_slot').value,
+                "no_of_guests": document.getElementById('guest_number').value
+                }
+            console.log('form data= '+JSON.stringify(formdata));
+            
+            post_url = get_post_url();
+            console.log("post url is: "+post_url)
+            submit_data(post_url, JSON.stringify(formdata));
+                
+        })
+       
+        function submit_data(url_directory,content){
+            const csrf_token_value = Cookies.get('csrftoken');
+            fetch(url_directory,{
+                method: 'POST',
+                headers: {'X-CSRFToken' : csrf_token_value},
+                body: content,
+                mode: 'same-origin'
+                }
+            )
+            .then(response => response.json())
+            .then(data => {
+                console.log('SUCCESS: '+data)
+            }) 
+            .catch((error) => {
+                console.log('POST ERROR: '+error)
+            });
+        };
+       
+        
+        function get_guest_number(){
+            guest_number_slots = '';
+            for(let i = 1; i <= 20; i++){
+                if(i === 1){
+                    guest_number_slots += `<option value="${i}">${i} person</option>`
+                }else{
+                    guest_number_slots += `<option value="${i}">${i} people</option>`
+                }
+            }
+            document.getElementById('guest_number').innerHTML = guest_number_slots;
+        }
+
+        function get_post_url(){
+            const post_url =  "{% url 'frontend:booking_ui' %}";
+            return post_url;
+        }
+
+        function get_selected_day_bookings(selected_day){
+            const selected_date_url = "{% url 'frontend:booking_ui_date' booking_date='placeholder' %} ".replace('placeholder', selected_day);
+            return selected_date_url;
+        }
+    </script>
+  
+    {% endblock %}
+

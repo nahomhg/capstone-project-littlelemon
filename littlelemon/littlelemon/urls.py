@@ -15,16 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-from restaurant.views import BookingViewSet
 
-router = routers.DefaultRouter()
-router.register(r'', viewset=BookingViewSet);
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Frontend where the user interacts
+    path('app/',include('frontend.urls')),
+    # API endpoints to call.
     path('api/', include('restaurant.urls')),
-    path('api/booking/', include(router.urls)),
+    # path('api/booking/', include(router.urls)),
+    # Authentication endpoints
     path('auth/',include('djoser.urls')),
     path('auth/',include('djoser.urls.authtoken')),
 ]

@@ -1,45 +1,48 @@
-from django.shortcuts import render
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, DestroyAPIView, UpdateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.viewsets import ModelViewSet
 from .models import Menu, Booking
 from .serializers import MenuSerializer, BookingSerializer
 from rest_framework.permissions import IsAuthenticated
-from django.views.generic import TemplateView
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from rest_framework.response import Response
+from django.http import HttpResponse
+from datetime import datetime
+from django.core import serializers
+import json
 
 # Create your views here.
+class ThrottleAPIMixin:
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
-class MenuItemView(ListCreateAPIView):
+class AuthenticationMixin:
+    permission_classes = [IsAuthenticated]
+
+class MenuItemView(ListCreateAPIView, ThrottleAPIMixin, AuthenticationMixin):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
-    # permission_classes = [IsAuthenticated];
-    
-class MenuItemsTemplate(TemplateView):
-    template_name = 'index.html';
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["data"] = MenuItemView.queryset.all;
-        return context
     
 
-class SingleItemView(RetrieveAPIView, DestroyAPIView,UpdateAPIView):
+class SingleItemView(RetrieveUpdateDestroyAPIView, ThrottleAPIMixin, AuthenticationMixin):
     queryset = Menu.objects.all();
     serializer_class = MenuSerializer
-    # permission_classes = [IsAuthenticated]
-
-
-
-class SingeItemTemplateView(TemplateView):
-    template_name = 'item_detail.html';
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["item"] = MenuItemView.queryset.get(pk=kwargs["pk"]);
-        return context;
-
-    
-    
-class BookingViewSet(ModelViewSet):
+class BookingViewSet(ModelViewSet, RetrieveUpdateDestroyAPIView , ThrottleAPIMixin, AuthenticationMixin):
     queryset = Booking.objects.all();
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, *args, **kwargs):
+        reservation_date = kwargs['booking_date'];
+        if Validate_Date.is_date(reservation_date):
+            bookings = Booking.objects.filter(booking_date__contains=reservation_date);
+            bookings_json = serializers.serialize('json',bookings)
+            return Response(json.loads(bookings_json),status=200);
+        return HttpResponse({"ERROR":"Invalid Date"},status=400)
+    
+
+class Validate_Date(datetime):
+    def is_date(value):
+        try:
+            date_value = datetime.strptime(value, '%Y-%m-%d').date()
+            return True;
+        except ValueError:
+            return False;

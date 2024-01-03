@@ -1,13 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-       <ul>
-         {% if data %}
-            {% for item in data %}
-             <li> <a href="{% url 'restaurant:item_detail' item.pk %} ">{{ item.title }}</a> - £{{item.price}} </li>
-            {% endfor %}
-         {% else %}
-            No Menu
-         {% endif %}
-      <ul>
+      <section>
+         <article>
+         <div class="row">
+            <div class="column">  
+            {% if items %}
+               {% for item in items %}
+               <p> <a href="{% url 'frontend:item_detail_ui' item.pk %} ">{{ item.title }}</a> <span class="menu-price"> £{{item.price}} </span> </p>
+               {% endfor %}
+            {% else %}
+               No Menu
+            {% endif %}
+            </div>
+         </div>
+         </article>
+      <section>
 {% endblock %}
