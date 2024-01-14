@@ -7,34 +7,33 @@
         <div class="row">
             <div class="column">
             <h1>Make Reservation</h1>
-                
-            <form method="POST" id="form" action="{% url 'frontend:booking_ui' %}">
+               <form method="POST" id="form" action="{% url 'frontend:booking_ui' %}">
                 {% csrf_token %}
                 <p>
                 <label for="first_name">Name</label>
-                <input type="text" placeholder="Reservation For..." maxlength="200" required id="first_name">
+                <input type="text" placeholder="Reservation For..." maxlength="200" id="first_name" name="first_name" required>
                 </p>
                 <p>
                 <label for="reservation_date">Reservation Date<label>
-                <input type="date" required id="reservation_date" data-url="{% url 'frontend:booking_ui' %}">
+                <input type="date" id="reservation_date" data-url="{% url 'frontend:booking_ui' %}" required>
                 </p>
                 <p>
                 <div class="container">
                     <div class="column-reservation-time"> 
                         <label for="reservation_slot">Reservation time</label>
-                        <select id="reservation_slot">
+                        <select id="reservation_slot" required>
                             <option value="0" disabled>Select time</option>
                         </select>
                     </div>
                     <div class="column-guest_number">
                         <label for="guest_number">Guest No.</label>
-                        <select id="guest_number">
+                        <select id="guest_number" required>
                            
                         </select>
                     </div>
                     </p>
                 </div>
-                <button type="button" id="button">Reserve</button>
+                <button id="button">Reserve</button>
             </form>
         </div>
 
@@ -76,14 +75,12 @@
             .then(r => r.json())
             .then(data => {
                 data_json = JSON.parse(JSON.stringify(data));
-
                 reserved_slots = []
                 bookings = []
 
                 for(let i = 0; i < data_json.length; i++){
-                    reserved_slots.push(data_json[i].fields['booking_slot']);
-                    console.log(reserved_slots);
-                    bookings.push(`<li>${data_json[i].fields['name']} - ${formatTime(data_json[i].fields['booking_slot'])}</li>`);
+                    reserved_slots.push(data_json[i]['booking_slot']);
+                    bookings.push(`<li>${data_json[i]['name']} - ${formatTime(data_json[i]['booking_slot'])}</li>`);
 
                 }
 
@@ -125,6 +122,7 @@
                 "booking_slot": document.getElementById('reservation_slot').value,
                 "no_of_guests": document.getElementById('guest_number').value
                 }
+
             console.log('form data= '+JSON.stringify(formdata));
             
             post_url = get_post_url();
@@ -142,16 +140,35 @@
                 mode: 'same-origin'
                 }
             )
-            .then(response => response.json())
+            .then( (response) => {
+                if(response.ok){    
+                    return response.json();  
+                }
+                else if(response.status === 429){
+                    throw new RateLimitError("API POST Limit Reached");
+                }
+                else if(response.status === 400){
+                    throw new InputError("Invalid Input - ")
+                }
+            })
             .then(data => {                
                 alert('Booking Made for '+JSON.stringify(data['name'])+' for '+JSON.stringify(data['booking_date'])+' at '+JSON.stringify(data['booking_slot'])+':00');
                 document.getElementById('form').reset();
             }) 
-            .catch((error) => {
-                console.log('POST ERROR: '+error)
+            .catch((RateLimitError) => {
+                console.log('POST ERROR: '+RateLimitError)
+                alert('Booking limit hit - please try again in an hour');
+            })
+            .catch((InputError) => {
+                console.log("Input Error: "+InputError)
+                alert('Booking limit hit - please try again in an hour');
+ 
             });
         };
        
+        function validate_input(content){
+           
+        }
         
         function get_guest_number(){
             guest_number_slots = '';
@@ -166,12 +183,13 @@
         }
 
         function get_post_url(){
-            const post_url =  "{% url 'frontend:booking_ui' %}";
+            const post_url =  "{% url 'restaurant:make_booking-list' %}";
             return post_url;
         }
 
         function get_selected_day_bookings(selected_day){
-            const selected_date_url = "{% url 'frontend:booking_ui_date' booking_date='placeholder' %} ".replace('placeholder', selected_day);
+            const selected_date_url = "{% url 'restaurant:list_booking' booking_date='placeholder' %} ".replace('placeholder', selected_day);
+            console.log('data ='+selected_date_url)
             return selected_date_url;
         }
     </script>

@@ -15,7 +15,8 @@ class BookingSerializer(ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Booking.objects.all(),
-                fields=['name','booking_date','booking_slot']
-            )
+                fields=['booking_date','booking_slot'],
+                message=("ERROR: Slot for that time already taken. Please try a different hour or date.")
+            ),
         ];
 

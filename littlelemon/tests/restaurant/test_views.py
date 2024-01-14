@@ -12,7 +12,6 @@ class MenuViewTest(TestCase):
         response = self.client.get('/api/menu/')
         serializer = MenuSerializer([self.orange_juice_test, self.apple_juice_test],many=True);
         print("data = "+str(response.data));
-
         self.assertEqual(response.data, serializer.data)
     
     def tearDown(self) -> None:

@@ -33,17 +33,17 @@ class SingeItemTemplateView(TemplateView, AuthenticationMixin, UserRateThrottle)
 class BookTableTemplate(TemplateView, ThrottleAPIMixin):
     template_name = 'booking.html'
     
-    @csrf_exempt
-    def post(self,request):
-        form_data_json = JSONParser().parse(request);
-        form_serializer = BookingSerializer(data=form_data_json);
-        if form_serializer.is_valid():
-            try:
-                form_serializer.save();
-            except:
-                print("error saving user\nError: "+str(form_serializer.errors))
+    # @csrf_exempt
+    # def post(self,request):
+    #     form_data_json = JSONParser().parse(request);
+    #     form_serializer = BookingSerializer(data=form_data_json);
+    #     if form_serializer.is_valid():
+    #         try:
+    #             form_serializer.save();
+    #         except:
+    #             print("error saving user\nError: "+str(form_serializer.errors))
                            
-            return JsonResponse(form_serializer.data,status=200)
-        else:
-            print("invalid form"+str(form_serializer.error_messages)+"\nERROR: "+str(form_serializer.errors))
-            return render(request, self.template_name, {});
+    #         return JsonResponse(form_serializer.data,status=200)
+    #     else:
+    #         print("invalid form"+str(form_serializer.error_messages)+"\nERROR: "+str(form_serializer.errors))
+    #         return render(request, self.template_name, {});
