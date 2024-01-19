@@ -1,6 +1,6 @@
 from typing import Any
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 from restaurant.views import MenuItemView
 from restaurant.views import ThrottleAPIMixin, AuthenticationMixin, UserRateThrottle
 from restaurant.serializers import BookingSerializer

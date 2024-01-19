@@ -7,7 +7,7 @@
         <div class="row">
             <div class="column">
             <h1>Make Reservation</h1>
-               <form method="POST" id="form" action="{% url 'frontend:booking_ui' %}">
+               <form id="form"> 
                 {% csrf_token %}
                 <p>
                 <label for="first_name">Name</label>
@@ -15,7 +15,7 @@
                 </p>
                 <p>
                 <label for="reservation_date">Reservation Date<label>
-                <input type="date" id="reservation_date" data-url="{% url 'frontend:booking_ui' %}" required>
+                <input type="date" id="reservation_date" required>
                 </p>
                 <p>
                 <div class="container">
@@ -132,7 +132,10 @@
         })
        
         function submit_data(url_directory,content){
+            alert("post data is - "+url_directory)
             const csrf_token_value = Cookies.get('csrftoken');
+            console.log('url data = '+url_directory);
+            
             fetch(url_directory,{
                 method: 'POST',
                 headers: {'X-CSRFToken' : csrf_token_value},
@@ -141,28 +144,27 @@
                 }
             )
             .then( (response) => {
+                alert("response is - "+response.json())
                 if(response.ok){    
                     return response.json();  
                 }
                 else if(response.status === 429){
-                    throw new RateLimitError("API POST Limit Reached");
+                    throw new Error("API POST Limit Reached - Please try again later");
                 }
                 else if(response.status === 400){
-                    throw new InputError("Invalid Input - ")
+                    throw new Error("Invalid Input - ")
                 }
+                else{
+                    throw new Error("Unexpected Error!")
+                }
+            
             })
             .then(data => {                
                 alert('Booking Made for '+JSON.stringify(data['name'])+' for '+JSON.stringify(data['booking_date'])+' at '+JSON.stringify(data['booking_slot'])+':00');
                 document.getElementById('form').reset();
             }) 
-            .catch((RateLimitError) => {
-                console.log('POST ERROR: '+RateLimitError)
-                alert('Booking limit hit - please try again in an hour');
-            })
-            .catch((InputError) => {
-                console.log("Input Error: "+InputError)
-                alert('Booking limit hit - please try again in an hour');
- 
+            .catch((error) => {
+                alert("ERROR: "+error)
             });
         };
        
