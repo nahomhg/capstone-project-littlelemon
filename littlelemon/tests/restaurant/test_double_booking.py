@@ -8,23 +8,50 @@ class TestDoubleBooking(TestCase):
     client = APIClient()
 
     def setUp(self):
-        self.customer_bob = Booking.objects.create(name="Bob Joe",no_of_guests=3, booking_date="2024-01-24", booking_slot="17");
-        self.customer_randy = Booking.objects.create(name="Rny Jxn", no_of_guests=4, booking_date="2024-01-22", booking_slot="15");
-        self.customer_rilo = Booking.objects.create(name="Rilo M",no_of_guests=6, booking_date="2024-01-24", booking_slot="17");
-        self.customer_ariel = Booking.objects.create(name="Ariel T", no_of_guests=3, booking_date="2024-01-22", booking_slot="15");
-
+        self.customer_bob = { 
+            "name":"Bob Joe",
+            "no_of_guests":3,
+            "booking_date":"2024-01-24",
+            "booking_slot": 17
+            };
+        self.customer_randy = {
+            "name": "Rny Jxn", 
+            "no_of_guests" : 4,
+            "booking_date" : "2024-01-22", 
+            "booking_slot" : 15
+            }
+        self.customer_rilo = {
+            "name":"Rilo M",
+            "no_of_guests":6, 
+            "booking_date":"2024-01-24", 
+            "booking_slot":17
+            }
+        self.customer_ariel = {
+            "name":"Ariel T",
+            "no_of_guests":3, 
+            "booking_date":"2024-01-22",
+            "booking_slot":15
+            };
 
     def test_duplicate_booking(self):
         
-        response = self.client.get('/api/booking/')
-        serializer = BookingSerializer([self.customer_bob, self.customer_randy, self.customer_rilo, self.customer_ariel], many=True);
-        print("response data ="+str(response.data))
-        self.assertFormError(response.data, serializer.data)
+        serializer_bob = BookingSerializer(data=self.customer_bob);
+        serializer_randy = BookingSerializer(data=self.customer_randy);
+        serializer_rilo = BookingSerializer(data=self.customer_rilo);
+        serializer_ariel = BookingSerializer(data=self.customer_ariel);
         
+        self.assertTrue(serializer_bob.is_valid())
+        serializer_bob.save();
+        self.assertTrue(serializer_randy.is_valid())
+        serializer_randy.save();
+
+        self.assertFalse(serializer_rilo.is_valid())
+        self.assertIn("ERROR: Slot for that time already taken. Please try a different hour or date.", serializer_rilo.errors["non_field_errors"])
+
+        self.assertFalse(serializer_ariel.is_valid());
+        self.assertIn("ERROR: Slot for that time already taken. Please try a different hour or date.", serializer_ariel.errors["non_field_errors"])
+    
 
     def tearDown(self):
-        self.customer_bob.delete();
-        self.customer_randy.delete();
-        self.customer_rilo.delete();
-        self.customer_ariel.delete();
+        Booking.objects.all().delete();
 

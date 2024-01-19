@@ -12,7 +12,9 @@ from django.http import HttpResponse, Http404
 from datetime import datetime
 from django.core import serializers
 from django.shortcuts import get_object_or_404
-import json
+import json, logging
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 class ThrottleAPIMixin:
@@ -47,9 +49,9 @@ class BookingViewSet(ModelViewSet, RetrieveUpdateDestroyAPIView, ThrottleAPIMixi
                 serialize_booking = BookingSerializer(instance=booking);
                 return Response(data=serialize_booking.data, status=200)
             except ValidationError:
-                print("Validation Error "+str(ValidationError))
+                logger.debug("Validation Error "+str(ValidationError))
             except ValueError:
-                print("ERROR: Value Error "+str(ValueError));
+                logger.debug("ERROR: Value Error "+str(ValueError));
         
         return Response({'retrieve':'data'}, status=200)
 
@@ -76,40 +78,14 @@ class BookingViewSet(ModelViewSet, RetrieveUpdateDestroyAPIView, ThrottleAPIMixi
         form_data_json = JSONParser().parse(request);
         form_serializer = BookingSerializer(data=form_data_json);
         if form_serializer.is_valid():
-            form_serializer.save();       
-            return Response(form_serializer.data,status=200)
+            form_serializer.save();      
+            logger.info("data is = "+str(form_serializer)) 
+            print("data saved")
+            return Response(form_serializer.data, status=200)
         else:
             print("invalid form"+str(form_serializer.error_messages)+"\nERROR: "+str())
-            return Response({'ERROR':f'{form_serializer.errors}'},status=400);
+            return Response({'ERROR':f'{form_serializer.errors}'},status=403);
     
-    # def list(self, request, *args, **kwargs):
-    #     reservation_date = kwargs['booking_date'];  
-    #     if Validate_Date.is_date(reservation_date):
-    #         bookings = Booking.objects.filter(booking_date__contains=reservation_date);
-    #        #print(bookings)
-    #         bookings_json = serializers.serialize('json',bookings)
-    #         return Response(json.loads(bookings_json),status=200);
-    #     else:
-    #         print("data not validating")
-    #     return HttpResponse({"ERROR":"Invalid Date"},status=400);    
-
-    # def retrieve(self, request, *args, **kwargs):
-    #     booking = BookingSerializer(self.queryset, many=True);
-    #     return Response(json.dumps(booking), status=200);
-
-    # def create(self, request, *args, **kwargs):
-    #     form_data_json = JSONParser().parse(request);
-    #     form_serializer = BookingSerializer(data=form_data_json);
-    #     if form_serializer.is_valid():
-    #         try:
-    #             form_serializer.save();
-    #         except:
-    #             print("error saving user\nError: "+str(form_serializer.errors))
-                           
-    #         return JsonResponse(form_serializer.data,status=200)
-    #     else:
-    #         print("invalid form"+str(form_serializer.error_messages)+"\nERROR: "+str(form_serializer.errors))
-    #         return render(request, self.template_name, {});
 def validate_time_slot(time_slot):
     return True if 10 < time_slot <= 20 else False;
 
