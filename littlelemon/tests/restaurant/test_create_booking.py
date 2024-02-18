@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 import datetime
 import json
 
-class MakeBookingTest(TestCase):
+class CreateBookingTest(TestCase):
     
     client = APIClient()
     today_date = datetime.date.today();
@@ -15,11 +15,10 @@ class MakeBookingTest(TestCase):
         self.booking_one = Booking.objects.create(name="Ada Lovelace", no_of_guests=5, booking_date=str(self.today_date), booking_slot=13)
         self.booking_two = Booking.objects.create(name="Rick Astley", no_of_guests=2, booking_date=str(self.today_date), booking_slot=18)
 
-    def test_getall_bookings(self):
-        response = self.client.get(f'/api/booking/{self.today_date}')
-        self.assertEqual(response.status_code, 200)
+    def test_create_booking(self):
         serializer = BookingSerializer([self.booking_one, self.booking_two], many=True).data
-        print("api: "+str(response.data)+"\n"+"serialized: "+str(serializer))
+        response = self.client.get(f'/api/bookings/{self.today_date}')
+        self.assertEqual(response.status_code, 200)
         jsn = json.dumps(serializer);
         print('json data='+str(jsn))
         self.assertEqual(response.data, serializer);

@@ -5,8 +5,6 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 router = routers.DefaultRouter()
 
-# router.register(r'booking', viewset=api_views.BookingViewSet, basename="make_booking");
-
 app_name = "restaurant"
 urlpatterns = [
     path('menu/', api_views.MenuItemView.as_view()),
@@ -18,6 +16,4 @@ urlpatterns = [
     path('api-token-auth/',  obtain_auth_token),
 ]
 
- # path('booking/<str:booking_date>/<int:booking_slot>/', api_views.BookingViewSet.as_view({'get':'booking_detail'}), name="detail_booking"),
-    # path('booking/<str:booking_date>', api_views.BookingViewSet.as_view({'get':'retrieve'}), name="list_booking"),
-    # # path('booking/<int:pk>', api_views.BookingViewSet(), name="update_booking"),
+ 
