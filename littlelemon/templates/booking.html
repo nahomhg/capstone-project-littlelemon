@@ -7,8 +7,7 @@
         <div class="row">
             <div class="column">
             <h1>Make Reservation</h1>
-               <form id="form"> 
-                {% csrf_token %}
+               <form id="form" > 
                 <p>
                 <label for="first_name">Name</label>
                 <input type="text" placeholder="Reservation For..." maxlength="200" id="first_name" name="first_name" required>
@@ -49,7 +48,6 @@
     </article>
     </section>
     <script>
-        
         const date = new Date()
         const month_format = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
         const current_date = `${date.getFullYear()}-${month_format}-${date.getDate().toString().padStart(2, "0")}`
@@ -126,17 +124,16 @@
             console.log('form data= '+JSON.stringify(formdata));
             
             post_url = get_post_url();
-            console.log("post url is: "+post_url)
             submit_data(post_url, JSON.stringify(formdata));
                 
         })
        
-        function submit_data(url_directory,content){
+        async function submit_data(url_directory,content){
             alert("post data is - "+url_directory)
             const csrf_token_value = Cookies.get('csrftoken');
             console.log('url data = '+url_directory);
             
-            fetch(url_directory,{
+            await fetch(url_directory,{
                 method: 'POST',
                 headers: {'X-CSRFToken' : csrf_token_value},
                 body: content,
@@ -144,14 +141,14 @@
                 }
             )
             .then( (response) => {
-                alert("response is - "+response.json())
+                response.clone().json();
                 if(response.ok){    
                     return response.json();  
                 }
-                else if(response.status === 429){
+                else if(response_clone.status === 429){
                     throw new Error("API POST Limit Reached - Please try again later");
                 }
-                else if(response.status === 400){
+                else if(response_clone.status === 400){
                     throw new Error("Invalid Input - ")
                 }
                 else{
@@ -162,6 +159,7 @@
             .then(data => {                
                 alert('Booking Made for '+JSON.stringify(data['name'])+' for '+JSON.stringify(data['booking_date'])+' at '+JSON.stringify(data['booking_slot'])+':00');
                 document.getElementById('form').reset();
+                
             }) 
             .catch((error) => {
                 alert("ERROR: "+error)
@@ -185,15 +183,15 @@
         }
 
         function get_post_url(){
-            const post_url =  "{% url 'restaurant:make_booking-list' %}";
+            const post_url =  "{% url 'restaurant:create' %}";
             return post_url;
         }
 
         function get_selected_day_bookings(selected_day){
-            const selected_date_url = "{% url 'restaurant:list_booking' booking_date='placeholder' %} ".replace('placeholder', selected_day);
+            const selected_date_url = "{% url 'restaurant:booking_list' booking_date='placeholder' %} ".replace('placeholder', selected_day);
             console.log('data ='+selected_date_url)
             return selected_date_url;
-        }
+        } 
     </script>
   
     {% endblock %}
