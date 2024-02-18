@@ -40,9 +40,30 @@ Step into repo:
 
     cd little_lemon_project 
     
-Start to install the dependencies:
+Start to install the packages:
 
     pipenv install
+
+Once all packages are installed, you can run this. By going into the 'LittleLemon' folder and running runserver:
+
+    cd littlelemon
+
+    python3 manage.py runserver
+
+
+
+Database
+
+The database credentials are already in the settings file.
+
+To enter, you must do:
+
+    mysql -u root -p
+
+Then enter pw provided.
+
+
+
 
 
 
