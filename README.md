@@ -60,7 +60,11 @@ To enter, you must do:
 
     mysql -u root -p
 
-Then enter pw provided.
+Then enter pw provided in 
+
+    LittleLemon > Littlelemon > settings.py
+
+
 
 
 
